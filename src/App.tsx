@@ -36,7 +36,9 @@ import {
   ChevronDown,
   Globe,
   Palette,
-  Wrench
+  Wrench,
+  Eye,
+  X
 } from 'lucide-react';
 import { 
   LineChart, 
@@ -89,7 +91,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     date: 'التاريخ',
     status: 'الحالة',
     edit_profile: 'تعديل الملف الشخصي',
-    wishlist: 'قائمة الأمنيات',
+    favorites: 'المفضلة',
     settings: 'الإعدادات',
     logout: 'تسجيل الخروج',
     fingerprint: 'تفعيل البصمة',
@@ -130,8 +132,8 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     browser_no_geo: 'متصفحك لا يدعم تحديد الموقع',
     geo_error: 'تعذر تحديد الموقع. يرجى التأكد من تفعيل إذن الوصول للموقع.',
     address_placeholder: 'مثال: حي النرجس، شارع الملك فهد',
-    wishlist_empty: 'قائمة الأمنيات فارغة',
-    wishlist_empty_desc: 'قائمة الأمنيات فارغة حالياً! اضغط على أيقونة القلب في المنتجات التي تنال إعجابك للرجوع إليها لاحقاً.',
+    favorites_empty: 'قائمة المفضلة فارغة',
+    favorites_empty_desc: 'قائمة المفضلة فارغة حالياً! اضغط على أيقونة القلب في المنتجات التي تنال إعجابك للرجوع إليها لاحقاً.',
     explore_products: 'استكشف المنتجات',
     explore_products_desc: 'عربة التسوق فارغة! دعنا نشحنها ببعض المنتجات الذكية والمبتكرة لمنزلك.',
     switches: 'مفاتيح ذكية',
@@ -189,8 +191,8 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     maintenance: 'صيانة',
     inspection: 'فحص دوري',
     added_to_cart: 'تمت الإضافة للسلة بنجاح',
-    removed_from_wishlist: 'تمت الإزالة من قائمة الأمنيات',
-    added_to_wishlist: 'تمت الإضافة لقائمة الأمنيات',
+    removed_from_favorites: 'تمت الإزالة من المفضلة',
+    added_to_favorites: 'تمت الإضافة للمفضلة',
     review_published: 'تم نشر تقييمك بنجاح',
     admin: 'مدير النظام',
     viewer: 'مشاهد فقط',
@@ -199,6 +201,12 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     order_management: 'إدارة الطلبات',
     read_only_access: 'لديك صلاحية المشاهدة فقط. لا يمكنك التعديل.',
     admin_actions: 'إجراءات المدير',
+    quick_view: 'نظرة سريعة',
+    close: 'إغلاق',
+    update_status: 'تحديث الحالة',
+    customer_info: 'معلومات العميل',
+    order_management_dashboard: 'إدارة طلبات العملاء',
+    change_status: 'تغيير الحالة',
   },
   en: {
     welcome_title: 'Smart Electric Store',
@@ -232,7 +240,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     date: 'Date',
     status: 'Status',
     edit_profile: 'Edit Profile',
-    wishlist: 'Wishlist',
+    favorites: 'Favorites',
     settings: 'Settings',
     logout: 'Logout',
     fingerprint: 'Fingerprint Login',
@@ -252,7 +260,6 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     confirm_order: 'Confirm & Send Order',
     order_success: 'Your order has been sent successfully',
     review_notice: 'The transfer will be reviewed by the manager.',
-    order_items: 'Order Items',
     all: 'All',
     pending: 'Pending',
     shipping_status: 'Shipping',
@@ -273,8 +280,8 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     browser_no_geo: 'Your browser does not support geolocation',
     geo_error: 'Unable to determine location. Please ensure location access is enabled.',
     address_placeholder: 'e.g., Al Narjis District, King Fahd Road',
-    wishlist_empty: 'Your wishlist is empty',
-    wishlist_empty_desc: 'Mark some items with a heart to keep track of what you love and save them for later.',
+    favorites_empty: 'Your favorites list is empty',
+    favorites_empty_desc: 'Mark some items with a heart to keep track of what you love and save them for later.',
     explore_products: 'Explore Products',
     explore_products_desc: 'Your cart is waiting for some energy! Explore our smart products and start your journey today.',
     switches: 'Smart Switches',
@@ -332,8 +339,8 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     maintenance: 'Maintenance',
     inspection: 'Regular Inspection',
     added_to_cart: 'Item added to cart successfully',
-    removed_from_wishlist: 'Removed from wishlist',
-    added_to_wishlist: 'Added to wishlist',
+    removed_from_favorites: 'Removed from favorites',
+    added_to_favorites: 'Added to favorites',
     review_published: 'Your review has been published',
     admin: 'Administrator',
     viewer: 'Viewer',
@@ -342,6 +349,13 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     order_management: 'Order Management',
     read_only_access: 'You have read-only access. You can not edit.',
     admin_actions: 'Admin Actions',
+    quick_view: 'Quick View',
+    close: 'Close',
+    update_status: 'Update Status',
+    customer_info: 'Customer Info',
+    order_items: 'Order Items',
+    order_management_dashboard: 'Order Management Dashboard',
+    change_status: 'Change Status',
   }
 };
 
@@ -351,31 +365,47 @@ const ProductCard: React.FC<{
   product: Product, 
   onClick: () => void, 
   onAddToCart: (p: Product) => void,
-  onToggleWishlist: (p: Product) => void,
-  isInWishlist: boolean,
-  formatPrice: (p: number) => string
+  onToggleFavorite: (p: Product) => void,
+  onQuickView: (p: Product) => void,
+  isFavorite: boolean,
+  formatPrice: (p: number) => string,
+  t: (k: string) => string
 }> = ({ 
   product, 
   onClick, 
   onAddToCart, 
-  onToggleWishlist, 
-  isInWishlist,
-  formatPrice
+  onToggleFavorite, 
+  onQuickView,
+  isFavorite,
+  formatPrice,
+  t
 }) => (
   <GlassCard 
-    className="p-1.5 border border-slate-100 dark:border-slate-800 cursor-pointer"
+    className="p-1.5 border border-slate-100 dark:border-slate-800 cursor-pointer group"
     onClick={onClick}
   >
     <div className="relative aspect-square rounded-md overflow-hidden mb-1.5">
-      <img src={product.image} className="w-full h-full object-cover" alt={product.name} referrerPolicy="no-referrer" />
+      <img src={product.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={product.name} referrerPolicy="no-referrer" />
+      <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+        <button 
+          className="bg-white/90 dark:bg-slate-900/90 text-black dark:text-white p-2 rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:bg-red-600 hover:text-white"
+          onClick={(e) => {
+            e.stopPropagation();
+            onQuickView(product);
+          }}
+          title={t('quick_view')}
+        >
+          <Eye size={16} />
+        </button>
+      </div>
       <button 
-        className={`absolute top-1 left-1 p-1 glass rounded-full transition-colors ${isInWishlist ? 'text-red-600' : 'text-black hover:text-red-600'}`}
+        className={`absolute top-1 left-1 p-1 glass rounded-full transition-colors z-10 ${isFavorite ? 'text-red-600' : 'text-black hover:text-red-600'}`}
         onClick={(e) => {
           e.stopPropagation();
-          onToggleWishlist(product);
+          onToggleFavorite(product);
         }}
       >
-        <Heart size={12} className={isInWishlist ? "fill-red-600" : ""} />
+        <Heart size={12} className={isFavorite ? "fill-red-600" : ""} />
       </button>
     </div>
     <h4 className="text-[11px] font-bold mb-0.5 line-clamp-1 text-black">{product.name}</h4>
@@ -399,6 +429,88 @@ const ProductCard: React.FC<{
   </GlassCard>
 );
 
+const QuickViewModal = ({ 
+  product, 
+  onClose, 
+  onAddToCart, 
+  formatPrice, 
+  t 
+}: { 
+  product: Product, 
+  onClose: () => void, 
+  onAddToCart: (p: Product) => void,
+  formatPrice: (p: number) => string,
+  t: (k: string) => string
+}) => (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+      onClick={onClose}
+    />
+    <motion.div 
+      initial={{ scale: 0.9, opacity: 0, y: 20 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      exit={{ scale: 0.9, opacity: 0, y: 20 }}
+      className="w-full max-w-sm relative z-10"
+    >
+      <GlassCard className="p-0 overflow-hidden border border-white/20 shadow-2xl">
+        <div className="relative">
+          <img src={product.image} className="w-full aspect-[4/3] object-cover" alt={product.name} referrerPolicy="no-referrer" />
+          <button 
+            onClick={onClose}
+            className="absolute top-3 right-3 p-2 glass rounded-full text-black hover:text-red-600 transition-colors shadow-lg"
+          >
+            <X size={18} />
+          </button>
+        </div>
+        <div className="p-6">
+          <div className="flex justify-between items-start mb-2">
+            <div>
+              <h2 className="text-xl font-bold text-black">{product.name}</h2>
+              <span className="text-xs text-slate-500 uppercase tracking-widest">{t(product.category) || product.category}</span>
+            </div>
+            <p className="text-xl font-bold text-red-600">{formatPrice(product.price)}</p>
+          </div>
+          
+          <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-1 bg-yellow-400/10 px-2 py-0.5 rounded-lg border border-yellow-400/20">
+              <Star size={14} className="fill-yellow-400 text-yellow-400" />
+              <span className="text-xs font-bold text-yellow-700">{product.rating}</span>
+            </div>
+            <span className="text-[10px] text-slate-500 font-medium">{product.reviewCount} {t('reviews')}</span>
+          </div>
+
+          <p className="text-xs text-black/70 mb-6 line-clamp-3 leading-relaxed">
+            {product.description}
+          </p>
+
+          <div className="grid grid-cols-2 gap-3">
+            <button 
+              onClick={onClose}
+              className="py-3 px-4 glass rounded-xl text-xs font-bold text-black hover:bg-slate-100 transition-colors"
+            >
+              {t('close')}
+            </button>
+            <button 
+              onClick={() => {
+                onAddToCart(product);
+                onClose();
+              }}
+              className="py-3 px-4 bg-red-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-red-600/20 hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+            >
+              <Plus size={14} />
+              {t('add_to_cart')}
+            </button>
+          </div>
+        </div>
+      </GlassCard>
+    </motion.div>
+  </div>
+);
+
 const GlassCard: React.FC<{ children: React.ReactNode, className?: string, onClick?: () => void }> = ({ children, className = "", onClick }) => (
   <div 
     onClick={onClick}
@@ -413,7 +525,7 @@ const Navbar = ({ currentView, setView, cartCount, t }: { currentView: View, set
     { id: 'home', icon: HomeIcon, label: t('home') },
     { id: 'categories', icon: Grid, label: t('categories') },
     { id: 'cart', icon: ShoppingCart, label: t('cart'), badge: cartCount },
-    { id: 'wishlist', icon: Heart, label: t('wishlist') },
+    { id: 'orders', icon: ClipboardList, label: t('orders') },
     { id: 'profile', icon: User, label: t('profile') },
   ];
 
@@ -557,17 +669,19 @@ const WelcomePage = ({ onEnter, t, setRole, currentRole }: { onEnter: () => void
 const HomePage = ({ 
   setView, 
   setSelectedProduct, 
+  setQuickViewProduct,
   addToCart, 
-  wishlist, 
-  toggleWishlist,
+  favorites, 
+  toggleFavorite,
   formatPrice,
   t
 }: { 
   setView: (v: View) => void, 
   setSelectedProduct: (p: Product) => void, 
+  setQuickViewProduct: (p: Product) => void,
   addToCart: (p: Product) => void,
-  wishlist: string[],
-  toggleWishlist: (p: Product) => void,
+  favorites: string[],
+  toggleFavorite: (p: Product) => void,
   formatPrice: (p: number) => string,
   t: (k: string) => string,
   key?: any
@@ -646,10 +760,12 @@ const HomePage = ({
             <ProductCard 
               key={product.id}
               product={product}
-              isInWishlist={wishlist.includes(product.id)}
-              onToggleWishlist={toggleWishlist}
+              isFavorite={favorites.includes(product.id)}
+              onToggleFavorite={toggleFavorite}
               onAddToCart={addToCart}
+              onQuickView={setQuickViewProduct}
               formatPrice={formatPrice}
+              t={t}
               onClick={() => {
                 setSelectedProduct(product);
                 setView('product-detail');
@@ -666,16 +782,12 @@ const ProductDetailPage = ({
   product, 
   setView, 
   addToCart, 
-  wishlist,
-  toggleWishlist,
   formatPrice, 
   t 
 }: { 
   product: Product, 
   setView: (v: View) => void, 
   addToCart: (p: Product) => void, 
-  wishlist: string[],
-  toggleWishlist: (p: Product) => void,
   formatPrice: (p: number) => string,
   t: (k: string) => string,
   key?: any
@@ -683,8 +795,6 @@ const ProductDetailPage = ({
   const [userRating, setUserRating] = useState(0);
   const [comment, setComment] = useState('');
   const [reviews, setReviews] = useState(product.reviews);
-
-  const isInWishlist = wishlist.includes(product.id);
 
   const handleSubmitReview = () => {
     if (userRating === 0) return;
@@ -714,14 +824,8 @@ const ProductDetailPage = ({
         <h2 className="text-xl font-bold text-black">{t('product_details')}</h2>
       </div>
 
-      <div className="aspect-square w-full rounded-2xl overflow-hidden mb-4 border border-slate-200 dark:border-slate-800 relative">
+      <div className="aspect-square w-full rounded-2xl overflow-hidden mb-4 border border-slate-200 dark:border-slate-800">
         <img src={product.image} className="w-full h-full object-cover" alt={product.name} />
-        <button 
-          onClick={() => toggleWishlist(product)}
-          className={`absolute top-4 left-4 p-3 glass rounded-full shadow-lg transition-all active:scale-90 ${isInWishlist ? 'text-red-600' : 'text-slate-400'}`}
-        >
-          <Heart size={24} className={isInWishlist ? 'fill-red-600' : ''} />
-        </button>
       </div>
 
       <div className="mb-6">
@@ -817,17 +921,19 @@ const ProductDetailPage = ({
 const CategoriesPage = ({ 
   setView, 
   setSelectedProduct, 
+  setQuickViewProduct,
   addToCart, 
-  wishlist, 
-  toggleWishlist,
+  favorites, 
+  toggleFavorite,
   formatPrice,
   t
 }: { 
   setView: (v: View) => void, 
   setSelectedProduct: (p: Product) => void, 
+  setQuickViewProduct: (p: Product) => void,
   addToCart: (p: Product) => void,
-  wishlist: string[],
-  toggleWishlist: (p: Product) => void,
+  favorites: string[],
+  toggleFavorite: (p: Product) => void,
   formatPrice: (p: number) => string,
   t: (k: string) => string,
   key?: any
@@ -870,44 +976,48 @@ const CategoriesPage = ({
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        {filteredProducts.map((product) => (
-          <ProductCard 
-            key={product.id}
-            product={product}
-            isInWishlist={wishlist.includes(product.id)}
-            onToggleWishlist={toggleWishlist}
-            onAddToCart={addToCart}
-            formatPrice={formatPrice}
-            onClick={() => {
-              setSelectedProduct(product);
-              setView('product-detail');
-            }}
-          />
-        ))}
+          {filteredProducts.map((product) => (
+            <ProductCard 
+              key={product.id}
+              product={product}
+              isFavorite={favorites.includes(product.id)}
+              onToggleFavorite={toggleFavorite}
+              onAddToCart={addToCart}
+              onQuickView={setQuickViewProduct}
+              formatPrice={formatPrice}
+              t={t}
+              onClick={() => {
+                setSelectedProduct(product);
+                setView('product-detail');
+              }}
+            />
+          ))}
       </div>
     </motion.div>
   );
 };
 
-const WishlistPage = ({ 
+const FavoritesPage = ({ 
   setView, 
   setSelectedProduct, 
+  setQuickViewProduct,
   addToCart, 
-  wishlist, 
-  toggleWishlist,
+  favorites, 
+  toggleFavorite,
   formatPrice,
   t
 }: { 
   setView: (v: View) => void, 
   setSelectedProduct: (p: Product) => void, 
+  setQuickViewProduct: (p: Product) => void,
   addToCart: (p: Product) => void,
-  wishlist: string[],
-  toggleWishlist: (p: Product) => void,
+  favorites: string[],
+  toggleFavorite: (p: Product) => void,
   formatPrice: (p: number) => string,
   t: (k: string) => string,
   key?: any
 }) => {
-  const wishlistProducts = PRODUCTS.filter(p => wishlist.includes(p.id));
+  const favoriteProducts = PRODUCTS.filter(p => favorites.includes(p.id));
 
   return (
     <motion.div 
@@ -919,10 +1029,10 @@ const WishlistPage = ({
         <button onClick={() => setView('home')} className="p-2 glass rounded-full text-black">
           <ChevronLeft size={24} className="rotate-180" />
         </button>
-        <h2 className="text-3xl font-bold text-black">{t('wishlist')}</h2>
+        <h2 className="text-3xl font-bold text-black">{t('favorites')}</h2>
       </div>
 
-      {wishlistProducts.length === 0 ? (
+      {favoriteProducts.length === 0 ? (
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -942,7 +1052,7 @@ const WishlistPage = ({
             transition={{ delay: 0.3 }}
             className="text-xl font-bold text-black mb-2"
           >
-            {t('wishlist_empty')}
+            {t('favorites_empty')}
           </motion.h3>
           <motion.p 
             initial={{ y: 10, opacity: 0 }}
@@ -950,7 +1060,7 @@ const WishlistPage = ({
             transition={{ delay: 0.4 }}
             className="text-slate-500 max-w-[240px] mb-8 leading-relaxed text-xs"
           >
-            {t('wishlist_empty_desc')}
+            {t('favorites_empty_desc')}
           </motion.p>
           <motion.button 
             initial={{ y: 10, opacity: 0 }}
@@ -967,14 +1077,16 @@ const WishlistPage = ({
         </motion.div>
       ) : (
         <div className="grid grid-cols-2 gap-4">
-          {wishlistProducts.map((product) => (
+          {favoriteProducts.map((product) => (
             <ProductCard 
               key={product.id}
               product={product}
-              isInWishlist={true}
-              onToggleWishlist={toggleWishlist}
+              isFavorite={true}
+              onToggleFavorite={toggleFavorite}
               onAddToCart={addToCart}
+              onQuickView={setQuickViewProduct}
               formatPrice={formatPrice}
+              t={t}
               onClick={() => {
                 setSelectedProduct(product);
                 setView('product-detail');
@@ -1214,6 +1326,134 @@ const OrdersPage = ({ orders, t, formatPrice, setView }: { orders: Order[], t: (
   );
 };
 
+const AdminOrdersPage = ({ 
+  orders, 
+  updateOrderStatus, 
+  t, 
+  formatPrice, 
+  setView, 
+  role 
+}: { 
+  orders: Order[], 
+  updateOrderStatus: (id: string, status: Order['status']) => void, 
+  t: (k: string) => string, 
+  formatPrice: (p: number) => string, 
+  setView: (v: View) => void,
+  role: UserRole,
+  key?: any 
+}) => {
+  const [filter, setFilter] = useState('all');
+  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
+
+  const filteredOrders = orders.filter(o => filter === 'all' || o.status === filter);
+
+  const statuses: Order['status'][] = ['pending', 'shipping', 'delivered', 'cancelled'];
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="pb-32 pt-12 px-6"
+    >
+      <div className="flex items-center gap-4 mb-6">
+        <button onClick={() => setView('admin-dashboard')} className="p-2 glass rounded-full text-black">
+          <ChevronLeft size={24} className="rtl:rotate-0 ltr:rotate-180" />
+        </button>
+        <h2 className="text-2xl font-bold text-black">{t('order_management_dashboard')}</h2>
+      </div>
+
+      <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar mb-6">
+        {['all', ...statuses].map((s) => (
+          <button
+            key={s}
+            onClick={() => setFilter(s)}
+            className={`px-4 py-2 rounded-full whitespace-nowrap transition-all text-xs font-bold ${
+              filter === s ? 'bg-red-600 text-white' : 'glass text-black border border-slate-200 dark:border-slate-800'
+            }`}
+          >
+            {s === 'all' ? t('all') : t(s)}
+          </button>
+        ))}
+      </div>
+
+      <div className="space-y-4">
+        {filteredOrders.map((order) => (
+          <GlassCard key={order.id} className="p-4 border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h3 className="font-bold text-black">{order.id}</h3>
+                <p className="text-[10px] text-slate-500">{order.date}</p>
+              </div>
+              <span className={`text-[10px] px-2 py-1 rounded-full font-bold ${
+                order.status === 'delivered' ? 'bg-emerald-100 text-emerald-600' :
+                order.status === 'shipping' ? 'bg-blue-100 text-blue-600' :
+                order.status === 'cancelled' ? 'bg-red-100 text-red-600' :
+                'bg-amber-100 text-amber-600'
+              }`}>
+                {t(order.status)}
+              </span>
+            </div>
+
+            {order.customerInfo && (
+              <div className="mb-4 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl">
+                <p className="text-[10px] font-bold text-black mb-1 flex items-center gap-2">
+                  <User size={12} className="text-red-600" />
+                  {t('customer_info')}
+                </p>
+                <div className="grid grid-cols-2 gap-2 text-[10px] text-black">
+                  <p><span className="text-slate-500">{t('name')}:</span> {order.customerInfo.name}</p>
+                  <p dir="ltr" className="rtl:text-right ltr:text-left"><span className="text-slate-500">{t('phone')}:</span> {order.customerInfo.phone}</p>
+                  <p className="col-span-2"><span className="text-slate-500">{t('address')}:</span> {order.customerInfo.address}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="mb-4">
+              <p className="text-[10px] font-bold text-black mb-1 flex items-center gap-2">
+                <Box size={12} className="text-red-600" />
+                {t('order_items')}
+              </p>
+              <div className="space-y-1">
+                {order.items.map((item, idx) => {
+                  const product = PRODUCTS.find(p => p.id === item.productId);
+                  return (
+                    <div key={idx} className="flex justify-between items-center text-[10px] text-black">
+                      <span>{product?.name || item.productId} x{item.quantity}</span>
+                      <span className="font-bold">{formatPrice((product?.price || 0) * item.quantity)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-2 text-right border-t border-slate-100 pt-1">
+                <span className="text-xs font-bold text-red-600">{t('total')}: {formatPrice(order.total)}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+              {statuses.map((s) => (
+                <button
+                  key={s}
+                  disabled={role === 'viewer' || order.status === s}
+                  onClick={() => updateOrderStatus(order.id, s)}
+                  className={`px-3 py-1.5 rounded-lg text-[9px] font-bold transition-all ${
+                    order.status === s 
+                      ? 'bg-slate-100 text-slate-400 cursor-not-allowed' 
+                      : role === 'viewer'
+                        ? 'opacity-50 grayscale cursor-not-allowed'
+                        : 'glass text-black hover:bg-slate-50 active:scale-95'
+                  }`}
+                >
+                  {t('change_to')} {t(s)}
+                </button>
+              ))}
+            </div>
+          </GlassCard>
+        ))}
+      </div>
+    </motion.div>
+  );
+};
+
 const AdminDashboard = ({ setView, t, formatPrice, role }: { setView: (v: View) => void, t: (k: string) => string, formatPrice: (p: number) => string, role: UserRole, key?: any }) => {
   const salesData = [
     { name: 'Sat', sales: 4000, profit: 2400 },
@@ -1342,6 +1582,7 @@ const AdminDashboard = ({ setView, t, formatPrice, role }: { setView: (v: View) 
             </button>
             <button 
               disabled={role === 'viewer'}
+              onClick={() => setView('admin-orders')}
               className={`p-4 rounded-2xl border flex flex-col items-center gap-3 transition-all ${role === 'viewer' ? 'opacity-50 grayscale bg-slate-50 border-slate-100 cursor-not-allowed' : 'bg-emerald-50/50 border-emerald-100 hover:bg-emerald-100 active:scale-95'}`}
             >
               <ShoppingCart size={20} className="text-emerald-600" />
@@ -1777,14 +2018,14 @@ const ProfilePage = ({
           )}
         </GlassCard>
 
-        {/* Orders & Wishlist */}
+        {/* Orders & Favorites */}
         <div className="grid grid-cols-2 gap-4">
           <GlassCard 
             className="p-4 flex flex-col items-center gap-2 cursor-pointer border border-slate-100 dark:border-slate-800"
-            onClick={() => setView('wishlist')}
+            onClick={() => setView('favorites')}
           >
             <Heart className="text-red-600" />
-            <span className="text-xs text-black">{t('wishlist')}</span>
+            <span className="text-xs text-black">{t('favorites')}</span>
           </GlassCard>
           <GlassCard 
             className="p-4 flex flex-col items-center gap-2 cursor-pointer border border-slate-100 dark:border-slate-800"
@@ -2151,8 +2392,9 @@ export default function App() {
   const [view, setView] = useState<View>('welcome');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [wishlist, setWishlist] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [language, setLanguage] = useState('ar');
   const [theme, setTheme] = useState('light');
   const [currency, setCurrency] = useState('SAR');
@@ -2187,9 +2429,30 @@ export default function App() {
 
   const t = (key: string) => TRANSLATIONS[language][key] || key;
   const [orders, setOrders] = useState<Order[]>([
-    { id: 'ORD-1234', date: '2024-03-10', status: 'shipping', total: 450, items: [] },
-    { id: 'ORD-1235', date: '2024-03-08', status: 'delivered', total: 120, items: [] },
-    { id: 'ORD-1236', date: '2024-03-05', status: 'cancelled', total: 85, items: [] },
+    { 
+      id: 'ORD-1234', 
+      date: '2024-03-10', 
+      status: 'shipping', 
+      total: 450, 
+      items: [{ productId: 'switch-1', quantity: 2 }],
+      customerInfo: { name: 'فهد العامري', email: 'fahad@example.com', phone: '0551234567', address: 'الرياض، العليا' }
+    },
+    { 
+      id: 'ORD-1235', 
+      date: '2024-03-08', 
+      status: 'delivered', 
+      total: 120, 
+      items: [{ productId: 'solar-1', quantity: 1 }],
+      customerInfo: { name: 'سارة خالد', email: 'sara@example.com', phone: '0567890123', address: 'جدة، الحمراء' }
+    },
+    { 
+      id: 'ORD-1236', 
+      date: '2024-03-05', 
+      status: 'cancelled', 
+      total: 85, 
+      items: [{ productId: 'timer-1', quantity: 3 }],
+      customerInfo: { name: 'محمد علي', email: 'mohammed@example.com', phone: '0543210987', address: 'الدمام، الشاطئ' }
+    },
   ]);
 
   const completeOrder = (transactionId: string, note: string) => {
@@ -2211,14 +2474,19 @@ export default function App() {
     alert(`${t('order_success')} ${newOrder.id}. ${t('review_notice')} (${t('transaction_id')}: ${transactionId})`);
   };
 
-  const toggleWishlist = (product: Product) => {
-    setWishlist(prev => {
-      const isInWishlist = prev.includes(product.id);
-      if (isInWishlist) {
-        toast(t('removed_from_wishlist'), { icon: <Heart size={16} /> });
+  const updateOrderStatus = (id: string, status: Order['status']) => {
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+    toast.success(t('update_status'));
+  };
+
+  const toggleFavorite = (product: Product) => {
+    setFavorites(prev => {
+      const isFavorite = prev.includes(product.id);
+      if (isFavorite) {
+        toast(t('removed_from_favorites'), { icon: <Heart size={16} /> });
         return prev.filter(id => id !== product.id);
       } else {
-        toast.success(t('added_to_wishlist'), { icon: <Heart size={16} className="fill-red-600 text-red-600" /> });
+        toast.success(t('added_to_favorites'), { icon: <Heart size={16} className="fill-red-600 text-red-600" /> });
         return [...prev, product.id];
       }
     });
@@ -2280,9 +2548,10 @@ export default function App() {
             key="home" 
             setView={setView} 
             setSelectedProduct={setSelectedProduct} 
+            setQuickViewProduct={setQuickViewProduct}
             addToCart={addToCart}
-            wishlist={wishlist}
-            toggleWishlist={toggleWishlist}
+            favorites={favorites}
+            toggleFavorite={toggleFavorite}
             formatPrice={formatPrice}
             t={t}
           />
@@ -2292,9 +2561,10 @@ export default function App() {
             key="categories" 
             setView={setView} 
             setSelectedProduct={setSelectedProduct} 
+            setQuickViewProduct={setQuickViewProduct}
             addToCart={addToCart}
-            wishlist={wishlist}
-            toggleWishlist={toggleWishlist}
+            favorites={favorites}
+            toggleFavorite={toggleFavorite}
             formatPrice={formatPrice}
             t={t}
           />
@@ -2310,14 +2580,15 @@ export default function App() {
             t={t}
           />
         )}
-        {view === 'wishlist' && (
-          <WishlistPage 
-            key="wishlist" 
+        {view === 'favorites' && (
+          <FavoritesPage 
+            key="favorites" 
             setView={setView} 
             setSelectedProduct={setSelectedProduct} 
+            setQuickViewProduct={setQuickViewProduct}
             addToCart={addToCart}
-            wishlist={wishlist}
-            toggleWishlist={toggleWishlist}
+            favorites={favorites}
+            toggleFavorite={toggleFavorite}
             formatPrice={formatPrice}
             t={t}
           />
@@ -2349,6 +2620,17 @@ export default function App() {
         {view === 'contact' && <ContactPage key="contact" setView={setView} t={t} />}
         {view === 'edit-profile' && <EditProfilePage key="edit-profile" setView={setView} t={t} />}
         {view === 'admin-dashboard' && <AdminDashboard key="admin-dashboard" setView={setView} t={t} formatPrice={formatPrice} role={role} />}
+        {view === 'admin-orders' && (
+          <AdminOrdersPage 
+            key="admin-orders" 
+            orders={orders} 
+            updateOrderStatus={updateOrderStatus} 
+            t={t} 
+            formatPrice={formatPrice} 
+            setView={setView} 
+            role={role} 
+          />
+        )}
         {view === 'request-engineer' && <RequestEngineerPage key="request-engineer" setView={setView} t={t} />}
         {view === 'product-detail' && selectedProduct && (
           <ProductDetailPage 
@@ -2356,8 +2638,18 @@ export default function App() {
             product={selectedProduct} 
             setView={setView} 
             addToCart={addToCart}
-            wishlist={wishlist}
-            toggleWishlist={toggleWishlist}
+            formatPrice={formatPrice}
+            t={t}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {quickViewProduct && (
+          <QuickViewModal 
+            product={quickViewProduct}
+            onClose={() => setQuickViewProduct(null)}
+            onAddToCart={addToCart}
             formatPrice={formatPrice}
             t={t}
           />
